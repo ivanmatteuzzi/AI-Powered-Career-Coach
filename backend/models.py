@@ -70,7 +70,6 @@ class Interview(Base):
         order_by="InterviewTurn.question_number",
     )
 
-
 class InterviewTurn(Base):
     """One question and the candidate's corresponding answer."""
 
@@ -104,4 +103,41 @@ class InterviewTurn(Base):
 
     interview: Mapped["Interview"] = relationship(
         back_populates="turns",
+    )
+
+class JobSearchRecord(Base):
+    """A saved job search and its results."""
+
+    __tablename__ = "job_searches"
+
+    id: Mapped[int] = mapped_column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+    )
+
+    target_role: Mapped[str] = mapped_column(
+        String(160),
+        nullable=False,
+    )
+
+    location: Mapped[str | None] = mapped_column(
+        String(160),
+        nullable=True,
+    )
+
+    request_data: Mapped[dict] = mapped_column(
+        JSON,
+        nullable=False,
+    )
+
+    result_data: Mapped[dict] = mapped_column(
+        JSON,
+        nullable=False,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        default=utc_now,
     )

@@ -4,9 +4,11 @@ from contextlib import asynccontextmanager
 from uuid import uuid4
 
 from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.orm import Session
+from backend.database import get_db
+from backend.models import JobSearchRecord
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session
 
 from backend.schemas import (
     JobSearchRequest,
@@ -307,19 +309,37 @@ def learning_roadmap_endpoint(
 )
 def job_search_endpoint(
     payload: JobSearchRequest,
+    db: Session = Depends(get_db),
 ) -> JobSearchResponse:
     try:
         from backend.services.job_search import search_jobs
 
-        return search_jobs(payload)
+        # 1. Run the job search
+        result = search_jobs(payload)
+
+        # 2. Create a database record
+        record = JobSearchRecord(
+            target_role=payload.target_role,
+            location=payload.location,
+            request_data=payload.model_dump(mode="json"),
+            result_data=result.model_dump(mode="json"),
+        )
+
+        # 3. Save the search and its results
+        db.add(record)
+        db.commit()
+
+        # 4. Return the results to the caller
+        return result
 
     except Exception as exc:
-        logger.exception("Job search failed")
+        db.rollback()
+        logger.exception("Job search failed or could not be saved")
         raise HTTPException(
             status_code=502,
             detail=(
-                "The job search service could not complete "
-                "the request. Please retry."
+                "The job search could not be completed or saved. "
+                "Please retry."
             ),
         ) from exc
 
