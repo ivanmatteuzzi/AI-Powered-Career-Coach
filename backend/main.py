@@ -56,6 +56,15 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+@app.get("/")
+def root():
+    return {
+        "message": "AI-Powered Career Coach API is running",
+        "status": "ok",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
 
 # CORS configuration for local frontend development.
 raw_origins = os.getenv("FRONTEND_ORIGINS") or (
