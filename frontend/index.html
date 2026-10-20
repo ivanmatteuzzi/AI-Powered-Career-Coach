@@ -38,6 +38,11 @@
           Dashboard
         </button>
 
+        <button class="nav-link" type="button" id="nav-job-history">
+        <span class="nav-icon">◷</span>
+        Job Search History
+        </button>
+
         <p class="nav-label">CAREER TOOLS</p>
 
         <button class="nav-link" type="button" data-module="cv-review">
@@ -197,6 +202,34 @@
           </button>
 
         </div>
+                <!-- RECENT JOB SEARCHES -->
+        <section id="job-history-panel" class="history-panel"
+         aria-labelledby="job-history-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="job-history-title">Recent Job Searches</h2>
+              <p>Your saved searches from this browser.</p>
+            </div>
+
+            <button
+              id="refresh-job-history"
+              class="history-refresh-button"
+              type="button"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <p
+            id="job-history-status"
+            class="history-status"
+            aria-live="polite"
+          >
+            Your saved searches will appear here.
+          </p>
+
+          <div id="job-history-list" class="history-list"></div>
+        </section>
       </section>
 
       <!-- TOOL WORKSPACE -->

@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 from collections.abc import Generator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 
@@ -67,7 +67,23 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def init_db() -> None:
-    """Create tables defined by the application's models."""
+    """Create tables and apply small, backward-compatible migrations."""
     from backend import models  # Register the models with SQLAlchemy
 
     Base.metadata.create_all(bind=engine)
+
+    # Add visitor_id to existing job-search tables, if needed.
+    inspector = inspect(engine)
+
+    if "job_searches" in inspector.get_table_names():
+        columns = {
+            column["name"]
+            for column in inspector.get_columns("job_searches")
+        }
+
+        if "visitor_id" not in columns:
+            with engine.begin() as connection:
+                connection.exec_driver_sql(
+                    "ALTER TABLE job_searches "
+                    "ADD COLUMN visitor_id VARCHAR(36)"
+                )

@@ -195,6 +195,9 @@ const $ = (selector) => document.querySelector(selector);
 
 const dashboardView = $("#dashboard-view");
 const workspaceView = $("#workspace-view");
+const jobHistoryList = $("#job-history-list");
+const jobHistoryStatus = $("#job-history-status");
+const refreshJobHistoryButton = $("#refresh-job-history");
 const moduleForm = $("#module-form");
 const formFields = $("#form-fields");
 const pageTitle = $("#page-title");
@@ -210,6 +213,7 @@ const visualResults = $("#visual-results");
 const chartsContainer = $("#charts-container");
 const textualResults = $("#textual-results");
 const resultsContent = $("#results-content");
+const jobHistoryNav = $("#nav-job-history");
 
 let activeModule = null;
 let mockInterviewState = null;
@@ -320,6 +324,19 @@ async function readResponse(response) {
   return data;
 }
 
+const VISITOR_ID_KEY = "career-coach-visitor-id";
+
+function getVisitorId() {
+  let visitorId = localStorage.getItem(VISITOR_ID_KEY);
+
+  if (!visitorId) {
+    visitorId = crypto.randomUUID();
+    localStorage.setItem(VISITOR_ID_KEY, visitorId);
+  }
+
+  return visitorId;
+}
+
 async function apiRequest(endpoint, payload = null, method = "POST") {
   const options = {
     method,
@@ -327,6 +344,13 @@ async function apiRequest(endpoint, payload = null, method = "POST") {
       "Accept": "application/json"
     }
   };
+
+  if (
+  endpoint === "/api/v1/jobs/search" ||
+  endpoint === "/api/v1/jobs/history"
+) {
+  options.headers["X-Visitor-ID"] = getVisitorId();
+}
 
   if (payload !== null) {
     options.headers["Content-Type"] = "application/json";
@@ -493,6 +517,25 @@ document.querySelectorAll("[data-module]").forEach((element) => {
 
 $("#back-to-dashboard").addEventListener("click", openDashboard);
 
+jobHistoryNav.addEventListener("click", async () => {
+  activeModule = null;
+  mockInterviewState = null;
+
+  dashboardView.hidden = false;
+  workspaceView.hidden = true;
+
+  document.querySelectorAll(".nav-link").forEach((button) => {
+    button.classList.toggle("active", button === jobHistoryNav);
+  });
+
+  await loadJobSearchHistory();
+
+  $("#job-history-panel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+});
+
 /* =========================================================
    FORM DATA AND API PAYLOADS
    ========================================================= */
@@ -619,8 +662,12 @@ moduleForm.addEventListener("submit", async (event) => {
       };
 
       renderMockInterviewQuestion(result);
-    } else {
+        } else {
       renderOutput(moduleKey, result);
+    }
+
+    if (moduleKey === "job-search") {
+      await loadJobSearchHistory();
     }
 
     setRequestStatus("Your results are ready.", "success");
@@ -1277,11 +1324,96 @@ function renderMockInterviewQuestion(data) {
   });
 }
 
+async function loadJobSearchHistory() {
+  if (!jobHistoryList || !jobHistoryStatus) {
+    return;
+  }
+
+  jobHistoryList.replaceChildren();
+  jobHistoryStatus.textContent = "Loading saved searches...";
+
+  try {
+    const records = await apiRequest(
+      "/api/v1/jobs/history",
+      null,
+      "GET"
+    );
+
+    if (!Array.isArray(records) || records.length === 0) {
+      jobHistoryStatus.textContent =
+        "No saved job searches in this browser yet.";
+      return;
+    }
+
+    jobHistoryStatus.textContent =
+      `Showing ${records.length} saved search${records.length === 1 ? "" : "es"}.`;
+
+    records.forEach((record) => {
+      const item = document.createElement("article");
+      item.className = "history-item";
+
+      const details = document.createElement("div");
+      details.className = "history-item-copy";
+
+      const title = document.createElement("h3");
+      title.textContent = record.target_role || "Job search";
+
+      const meta = document.createElement("p");
+      const date = record.created_at
+        ? new Date(record.created_at)
+        : null;
+
+      const dateText =
+        date && !Number.isNaN(date.getTime())
+          ? date.toLocaleString()
+          : "";
+
+      meta.textContent = [
+        record.location,
+        dateText
+      ].filter(Boolean).join(" · ");
+
+      details.append(title, meta);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "history-view-button";
+      button.textContent = "View results";
+
+      button.addEventListener("click", () => {
+        if (!record.result_data) {
+          jobHistoryStatus.textContent =
+            "Saved results are unavailable.";
+          return;
+        }
+
+        openModule("job-search");
+        renderOutput("job-search", record.result_data);
+        setRequestStatus("Showing saved results.", "success");
+      });
+
+      item.append(details, button);
+      jobHistoryList.appendChild(item);
+    });
+  } catch (error) {
+    console.error("Could not load job search history:", error);
+
+    jobHistoryStatus.textContent =
+      "Could not load saved searches. Please try again.";
+  }
+}
+
 /* =========================================================
    INITIALIZATION
    ========================================================= */
+refreshJobHistoryButton.addEventListener(
+  "click",
+  loadJobSearchHistory
+);
 
 openDashboard();
 checkApiStatus();
+
+loadJobSearchHistory();
 
 /* End of frontend controller. */

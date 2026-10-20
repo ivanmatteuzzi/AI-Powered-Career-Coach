@@ -126,6 +126,11 @@ class JobSearchRecord(Base):
         nullable=True,
     )
 
+    visitor_id: Mapped[str | None] = mapped_column(
+        String(36),
+        nullable=True,
+    )
+
     request_data: Mapped[dict] = mapped_column(
         JSON,
         nullable=False,

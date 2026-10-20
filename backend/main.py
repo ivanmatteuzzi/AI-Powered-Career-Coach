@@ -3,12 +3,15 @@ import logging
 from contextlib import asynccontextmanager
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import JobSearchRecord
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
+
+from typing import Any
+from uuid import UUID
 
 from backend.schemas import (
     JobSearchRequest,
@@ -85,7 +88,11 @@ app.add_middleware(
     allow_origins=allowed_origins,
     allow_credentials=False,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=[
+    "Content-Type",
+    "Authorization",
+    "X-Visitor-ID",
+],
 )
 
 
@@ -310,6 +317,10 @@ def learning_roadmap_endpoint(
 def job_search_endpoint(
     payload: JobSearchRequest,
     db: Session = Depends(get_db),
+    visitor_id: UUID | None = Header(
+        default=None,
+        alias="X-Visitor-ID",
+    ),
 ) -> JobSearchResponse:
     try:
         from backend.services.job_search import search_jobs
@@ -321,6 +332,7 @@ def job_search_endpoint(
         record = JobSearchRecord(
             target_role=payload.target_role,
             location=payload.location,
+            visitor_id=str(visitor_id) if visitor_id is not None else None,
             request_data=payload.model_dump(mode="json"),
             result_data=result.model_dump(mode="json"),
         )
@@ -341,6 +353,39 @@ def job_search_endpoint(
                 "The job search could not be completed or saved. "
                 "Please retry."
             ),
+        ) from exc
+
+@app.get("/api/v1/jobs/history")
+def job_search_history_endpoint(
+    visitor_id: UUID = Header(..., alias="X-Visitor-ID"),
+    db: Session = Depends(get_db),
+) -> list[dict[str, Any]]:
+    try:
+        records = (
+            db.query(JobSearchRecord)
+            .filter(JobSearchRecord.visitor_id == str(visitor_id))
+            .order_by(JobSearchRecord.created_at.desc())
+            .limit(10)
+            .all()
+        )
+
+        return [
+            {
+                "id": record.id,
+                "target_role": record.target_role,
+                "location": record.location,
+                "created_at": record.created_at,
+                "request_data": record.request_data,
+                "result_data": record.result_data,
+            }
+            for record in records
+        ]
+
+    except SQLAlchemyError as exc:
+        logger.exception("Failed to load job search history")
+        raise HTTPException(
+            status_code=500,
+            detail="The search history could not be loaded.",
         ) from exc
 
 

@@ -1597,3 +1597,97 @@ p {
     animation-iteration-count: 1 !important;
   }
 }
+/* =========================================================
+   JOB SEARCH HISTORY
+   ========================================================= */
+
+.history-panel {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.04);
+}
+
+.history-panel .section-heading {
+  margin-bottom: 1.25rem;
+}
+
+.history-status {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.history-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.history-item-copy {
+  min-width: 0;
+}
+
+.history-item-copy h3 {
+  margin: 0 0 0.35rem;
+  color: #172554;
+  font-size: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.history-item-copy p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.history-refresh-button,
+.history-view-button {
+  flex-shrink: 0;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1e3a8a;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.history-refresh-button:hover,
+.history-view-button:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.history-refresh-button:focus-visible,
+.history-view-button:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .history-panel {
+    padding: 1rem;
+  }
+
+  .history-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
