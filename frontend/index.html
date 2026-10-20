@@ -1,0 +1,329 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="description"
+    content="An AI-powered career coach to improve your CV, discover jobs, analyse skills and prepare for interviews."
+  >
+
+  <title>AI Career Coach</title>
+
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+
+<body>
+  <div class="app-shell">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <a class="brand" href="#" data-module="dashboard">
+        <span class="brand-mark">C</span>
+        <span class="brand-text">
+          <strong>Career Coach</strong>
+          <small>AI-powered workspace</small>
+        </span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <p class="nav-label">WORKSPACE</p>
+
+        <button class="nav-link active" type="button"
+                data-module="dashboard">
+          <span class="nav-icon">⌂</span>
+          Dashboard
+        </button>
+
+        <p class="nav-label">CAREER TOOLS</p>
+
+        <button class="nav-link" type="button" data-module="cv-review">
+          <span class="nav-icon">▤</span>
+          CV Review
+        </button>
+
+        <button class="nav-link" type="button" data-module="job-fit">
+          <span class="nav-icon">◎</span>
+          Job Fit Analysis
+        </button>
+
+        <button class="nav-link" type="button" data-module="job-search">
+          <span class="nav-icon">⌕</span>
+          Job Search
+        </button>
+
+        <button class="nav-link" type="button"
+                data-module="learning-roadmap">
+          <span class="nav-icon">↗</span>
+          Learning Roadmap
+        </button>
+
+        <button class="nav-link" type="button"
+                data-module="mock-interview">
+          <span class="nav-icon">◉</span>
+          Mock Interview
+        </button>
+
+        <button class="nav-link" type="button"
+                data-module="company-interview">
+          <span class="nav-icon">▦</span>
+          Company Interview Prep
+        </button>
+
+        <button class="nav-link" type="button" data-module="llm-judge">
+          <span class="nav-icon">✓</span>
+          AI Output Evaluator
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span id="api-status-dot" class="status-dot"></span>
+        <span id="api-status" role="status">Checking backend...</span>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+      <header class="topbar">
+        <div>
+          <span class="topbar-label">YOUR CAREER WORKSPACE</span>
+        </div>
+
+        <a
+          class="docs-link"
+          href="https://ai-powered-career-coach-n2kh.onrender.com/docs"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          API documentation ↗
+        </a>
+      </header>
+
+      <!-- DASHBOARD -->
+      <section id="dashboard-view" class="dashboard-view">
+
+        <div class="hero">
+          <p class="eyebrow">CAREER DEVELOPMENT, SIMPLIFIED</p>
+
+          <h1>Build your next career move.</h1>
+
+          <p class="hero-description">
+            Improve your CV, discover opportunities, understand your skill
+            gaps and prepare for your next interview.
+          </p>
+        </div>
+
+        <div class="section-heading">
+          <div>
+            <h2>Your career tools</h2>
+            <p>Choose a tool to get started.</p>
+          </div>
+
+          <span class="tool-count">7 TOOLS</span>
+        </div>
+
+        <div class="tool-grid">
+
+          <button class="tool-card" type="button" data-module="cv-review">
+            <span class="tool-icon">CV</span>
+            <span class="tool-card-title">CV Review</span>
+            <span class="tool-card-description">
+              Identify strengths, weaknesses and improvements for your CV.
+            </span>
+            <span class="tool-card-action">Review your CV →</span>
+          </button>
+
+          <button class="tool-card" type="button" data-module="job-fit">
+            <span class="tool-icon">FIT</span>
+            <span class="tool-card-title">Job Fit Analysis</span>
+            <span class="tool-card-description">
+              Compare your experience with a job description and identify
+              skill gaps.
+            </span>
+            <span class="tool-card-action">Analyse job fit →</span>
+          </button>
+
+          <button class="tool-card" type="button" data-module="job-search">
+            <span class="tool-icon">JOB</span>
+            <span class="tool-card-title">Job Search</span>
+            <span class="tool-card-description">
+              Discover job opportunities matching your criteria.
+            </span>
+            <span class="tool-card-action">Find opportunities →</span>
+          </button>
+
+          <button class="tool-card" type="button"
+                  data-module="learning-roadmap">
+            <span class="tool-icon">PLAN</span>
+            <span class="tool-card-title">Learning Roadmap</span>
+            <span class="tool-card-description">
+              Turn skill gaps into a practical, measurable learning plan.
+            </span>
+            <span class="tool-card-action">Build a roadmap →</span>
+          </button>
+
+          <button class="tool-card" type="button"
+                  data-module="mock-interview">
+            <span class="tool-icon">INT</span>
+            <span class="tool-card-title">Mock Interview</span>
+            <span class="tool-card-description">
+              Practise answering interview questions and review your
+              performance.
+            </span>
+            <span class="tool-card-action">Start practising →</span>
+          </button>
+
+          <button class="tool-card" type="button"
+                  data-module="company-interview">
+            <span class="tool-icon">CO</span>
+            <span class="tool-card-title">Company Interview Prep</span>
+            <span class="tool-card-description">
+              Research a company and prepare for a role-specific interview.
+            </span>
+            <span class="tool-card-action">Prepare for a company →</span>
+          </button>
+
+          <button class="tool-card" type="button" data-module="llm-judge">
+            <span class="tool-icon">AI</span>
+            <span class="tool-card-title">AI Output Evaluator</span>
+            <span class="tool-card-description">
+              Evaluate AI-generated results for quality and reliability.
+            </span>
+            <span class="tool-card-action">Evaluate output →</span>
+          </button>
+
+        </div>
+      </section>
+
+      <!-- TOOL WORKSPACE -->
+      <section id="workspace-view" class="workspace-view" hidden>
+
+        <button id="back-to-dashboard" class="back-link" type="button">
+          ← Back to dashboard
+        </button>
+
+        <div class="page-heading">
+          <p id="module-eyebrow" class="eyebrow">CAREER TOOL</p>
+          <h1 id="page-title">Career Tool</h1>
+          <p id="page-description"></p>
+        </div>
+
+        <div class="workspace-grid">
+
+          <!-- INPUT FORM -->
+          <section class="panel input-panel">
+            <div class="panel-heading">
+              <h2>Your information</h2>
+              <p id="form-intro">
+                Complete the fields below to get started.
+              </p>
+            </div>
+
+            <form id="module-form">
+              <div id="form-fields"></div>
+
+              <button
+                id="submit-button"
+                class="primary-button"
+                type="submit"
+              >
+                Generate results
+              </button>
+            </form>
+
+            <p
+              id="request-status"
+              class="request-status"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </section>
+
+          <!-- RESULTS -->
+          <section class="panel results-panel">
+
+            <div class="panel-heading">
+              <h2>Your results</h2>
+              <p>
+                Written insights and visual analysis based on your
+                information.
+              </p>
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div id="results-empty" class="results-empty">
+              <span class="empty-icon">✳</span>
+
+              <h3>Your results will appear here</h3>
+
+              <p>
+                Complete the form and submit it to see your personalised
+                career insights, scores and charts.
+              </p>
+            </div>
+
+            <!-- VISUAL RESULTS -->
+            <section
+              id="visual-results"
+              class="visual-results"
+              aria-labelledby="visual-results-title"
+              hidden
+            >
+              <div class="results-section-heading">
+                <div>
+                  <h3 id="visual-results-title">Visual insights</h3>
+                  <p>
+                    Explore your results through charts and indicators.
+                  </p>
+                </div>
+              </div>
+
+              <!-- JavaScript will generate relevant charts here. -->
+              <div
+                id="charts-container"
+                class="charts-grid"
+                aria-label="Visual analysis charts"
+              ></div>
+
+              <p class="chart-note">
+                Charts are based on the available analysis data.
+                Scores and categories are estimates when generated by AI.
+              </p>
+            </section>
+
+            <!-- WRITTEN RESULTS -->
+            <section
+              id="textual-results"
+              class="textual-results"
+              aria-labelledby="textual-results-title"
+              hidden
+            >
+              <div class="results-section-heading">
+                <div>
+                  <h3 id="textual-results-title">Detailed results</h3>
+                  <p>Read the full analysis and recommendations.</p>
+                </div>
+              </div>
+
+              <!-- JavaScript will render the written results here. -->
+              <div id="results-content"></div>
+            </section>
+
+          </section>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer">
+        <span>AI Career Coach</span>
+        <span>Review AI-generated guidance before using it.</span>
+      </footer>
+
+    </main>
+  </div>
+</body>
+</html>

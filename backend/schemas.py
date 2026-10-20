@@ -103,7 +103,7 @@ class CVReviewRequest(BaseModel):
         max_length=12000,
         description="Optional job advertisement",
     )
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class CVReviewIssue(BaseModel):
@@ -173,7 +173,7 @@ class JobFitRequest(BaseModel):
     target_role: str = Field(min_length=2, max_length=160)
     cv_text: str = Field(min_length=100, max_length=30000)
     job_description: str = Field(min_length=100, max_length=12000)
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class JobFitFinding(BaseModel):
@@ -224,7 +224,7 @@ class LearningRoadmapRequest(BaseModel):
         "videos",
         "hands_on"
     ] = "mixed"
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class LearningActivity(BaseModel):
@@ -305,7 +305,7 @@ class JobSearchRequest(BaseModel):
     skills: list[str] = Field(default_factory=list, max_length=30)
     keywords: list[str] = Field(default_factory=list, max_length=20)
     max_results: int = Field(default=10, ge=1, le=25)
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class JobPosting(BaseModel):
@@ -365,7 +365,7 @@ class CompanyInterviewPrepRequest(BaseModel):
         "senior",
     ] = "junior"
     number_of_questions: int = Field(default=8, ge=3, le=15)
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class CompanyResearchSource(BaseModel):
@@ -432,7 +432,7 @@ class LLMJudgeRequest(BaseModel):
         default_factory=list,
         max_length=20,
     )
-    language: Literal["English", "Italian", "German"] = "English"
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
 
 
 class JudgeDimensionScore(BaseModel):
