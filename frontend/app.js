@@ -975,7 +975,62 @@ function renderValue(label, value, parent, depth = 0) {
         const cardTitle = getObjectTitle(item, index);
 
         card.appendChild(createElement("h4", "", cardTitle));
-        renderObjectContents(item, card);
+
+        const isDimensionScore =
+          item.dimension !== undefined &&
+          item.score !== undefined &&
+          (
+            item.rationale !== undefined ||
+            item.evidence !== undefined
+          );
+
+        if (isDimensionScore) {
+          const scoreRow = createElement("p", "result-score");
+          scoreRow.textContent = `Score: ${item.score}/5`;
+          card.appendChild(scoreRow);
+
+          for (const [key, fieldValue] of Object.entries(item)) {
+            if (
+              ["dimension", "score"].includes(key) ||
+              fieldValue === null ||
+              fieldValue === undefined ||
+              fieldValue === ""
+            ) {
+              continue;
+            }
+
+            const field = createElement("div", "result-card-field");
+            const fieldLabel = createElement(
+              "strong",
+              "",
+              `${readableLabel(key)}: `
+            );
+
+            field.appendChild(fieldLabel);
+
+            if (
+              typeof fieldValue === "string" ||
+              typeof fieldValue === "number" ||
+              typeof fieldValue === "boolean"
+            ) {
+              field.appendChild(
+                document.createTextNode(String(fieldValue))
+              );
+            } else {
+              renderValue(
+                readableLabel(key),
+                fieldValue,
+                field,
+                depth + 1
+              );
+            }
+
+            card.appendChild(field);
+          }
+        } else {
+          renderObjectContents(item, card);
+        }
+
         block.appendChild(card);
       });
     }
@@ -986,8 +1041,7 @@ function renderValue(label, value, parent, depth = 0) {
   } else if (typeof value === "boolean") {
     block.appendChild(createElement("p", "", value ? "Yes" : "No"));
   } else {
-    const text = createElement("p", "", String(value));
-    block.appendChild(text);
+    block.appendChild(createElement("p", "", String(value)));
   }
 
   parent.appendChild(block);
