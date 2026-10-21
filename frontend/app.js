@@ -696,6 +696,7 @@ function clearResults() {
   resultsContent.replaceChildren();
 }
 
+
 function renderOutput(moduleKey, data) {
   resultsEmpty.hidden = true;
   textualResults.hidden = false;
@@ -703,6 +704,7 @@ function renderOutput(moduleKey, data) {
   resultsContent.replaceChildren();
   chartsContainer.replaceChildren();
 
+  // Keep the existing chart rendering unchanged.
   const charts = buildCharts(moduleKey, data);
 
   if (charts.length > 0) {
@@ -719,7 +721,207 @@ function renderOutput(moduleKey, data) {
     visualResults.hidden = true;
   }
 
-  renderObjectContents(data, resultsContent);
+  // Organize written results into key results and expandable details.
+  renderCompactResults(moduleKey, data, resultsContent);
+}
+
+function renderCompactResults(moduleKey, data, parent) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    renderValue("Result", data, parent);
+    return;
+  }
+
+  const entries = Object.entries(data).filter(
+    ([, value]) =>
+      value !== null &&
+      value !== undefined &&
+      value !== ""
+  );
+
+  if (entries.length === 0) {
+    renderValue("Result", data, parent);
+    return;
+  }
+
+  const moduleOverviewKeys = {
+    "cv-review": [
+      "overall_assessment",
+      "summary",
+      "executive_summary",
+      "overall_score",
+      "verdict",
+      "recommendation"
+    ],
+
+    "job-fit": [
+      "overall_assessment",
+      "summary",
+      "fit_score",
+      "verdict",
+      "recommendation"
+    ],
+
+    "job-search": [
+      "search_summary",
+      "summary",
+      "total_found",
+      "jobs_found",
+      "query",
+      "location"
+    ],
+
+    "learning-roadmap": [
+      "summary",
+      "learning_goal",
+      "total_weeks",
+      "weekly_hours",
+      "recommendation"
+    ],
+
+    "company-interview": [
+      "summary",
+      "company_overview",
+      "interview_strategy",
+      "key_takeaways",
+      "recommendation"
+    ],
+
+    "llm-judge": [
+      "verdict",
+      "overall_score",
+      "score",
+      "evaluation_summary",
+      "overall_assessment",
+      "summary"
+    ]
+  };
+
+  const commonOverviewKeys = [
+    "summary",
+    "executive_summary",
+    "overall_summary",
+    "overall_assessment",
+    "verdict",
+    "overall_score",
+    "fit_score",
+    "score",
+    "recommendation",
+    "final_recommendation",
+    "conclusion"
+  ];
+
+  const normalizeKey = (key) =>
+    String(key).toLowerCase().replace(/[\s_-]/g, "");
+
+  const preferredKeys = [
+    ...(moduleOverviewKeys[moduleKey] || []),
+    ...commonOverviewKeys
+  ].map(normalizeKey);
+
+  // Prefer meaningful summary fields already returned by the AI.
+  const overviewEntries = [];
+
+  for (const preferredKey of preferredKeys) {
+    const match = entries.find(
+      ([key]) => normalizeKey(key) === preferredKey
+    );
+
+    if (
+      match &&
+      !overviewEntries.some(([key]) => key === match[0])
+    ) {
+      overviewEntries.push(match);
+    }
+
+    if (overviewEntries.length >= 4) {
+      break;
+    }
+  }
+
+  // If there are no summary fields, show a few concise metrics.
+  if (overviewEntries.length === 0) {
+    const metricEntries = entries.filter(([key, value]) =>
+      /score|rating|verdict|status|total|count|weeks|hours|fit|match/i.test(key) &&
+      (typeof value === "number" || typeof value === "boolean" ||
+        (typeof value === "string" && value.length <= 180))
+    );
+
+    overviewEntries.push(...metricEntries.slice(0, 4));
+  }
+
+  // Final fallback: show up to two short text values, not long analysis sections.
+  if (overviewEntries.length === 0) {
+    const excludedFromFallback =
+      /description|analysis|details|reason|explanation|evidence|strengths|issues|jobs|weeks|skills|requirements|questions|recommendations|actions|steps|risks|gaps/i;
+
+    const shortEntries = entries.filter(([key, value]) =>
+      !excludedFromFallback.test(key) &&
+      (
+        typeof value === "number" ||
+        typeof value === "boolean" ||
+        (typeof value === "string" && value.length <= 180)
+      )
+    );
+
+    overviewEntries.push(...shortEntries.slice(0, 2));
+  }
+
+  const overviewKeys = new Set(
+    overviewEntries.map(([key]) => key)
+  );
+
+  const detailEntries = entries.filter(
+    ([key]) => !overviewKeys.has(key)
+  );
+
+  if (overviewEntries.length > 0) {
+    const overviewHeading = createElement(
+      "section",
+      "result-block result-overview"
+    );
+
+    overviewHeading.appendChild(
+      createElement("h3", "", "Key results")
+    );
+
+    overviewEntries.forEach(([key, value]) => {
+      renderValue(readableLabel(key), value, overviewHeading);
+    });
+
+    parent.appendChild(overviewHeading);
+  } else {
+    parent.appendChild(
+      createElement(
+        "p",
+        "results-detail-hint",
+        "Open the detailed analysis below to view the complete results."
+      )
+    );
+  }
+
+  if (detailEntries.length > 0) {
+    const details = createElement("details", "result-details");
+
+    const summary = createElement(
+      "summary",
+      "result-details-summary",
+      "Detailed analysis and remaining results"
+    );
+
+    const detailsContent = createElement(
+      "div",
+      "result-details-content"
+    );
+
+    details.appendChild(summary);
+    details.appendChild(detailsContent);
+
+    detailEntries.forEach(([key, value]) => {
+      renderValue(readableLabel(key), value, detailsContent);
+    });
+
+    parent.appendChild(details);
+  }
 }
 
 function renderObjectContents(object, parent) {
@@ -1415,5 +1617,3 @@ openDashboard();
 checkApiStatus();
 
 loadJobSearchHistory();
-
-/* End of frontend controller. */

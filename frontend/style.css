@@ -1691,3 +1691,67 @@ p {
     flex-direction: column;
   }
 }
+
+/* =========================================================
+   COMPACT RESULTS AND EXPANDABLE DETAILS
+   ========================================================= */
+
+.result-overview {
+  margin-bottom: 16px;
+}
+
+.result-overview > .result-block {
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface-soft);
+}
+
+.result-overview > .result-block:last-child {
+  margin-bottom: 0;
+}
+
+.result-details {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.result-details-summary {
+  padding: 15px 18px;
+  color: var(--navy);
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+  background: var(--surface-soft);
+}
+
+.result-details-summary:hover {
+  background: var(--blue-soft);
+}
+
+.result-details[open] > .result-details-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.result-details-content {
+  padding: 16px;
+}
+
+.result-details-content > .result-block:first-child {
+  margin-top: 0;
+}
+
+.result-details-content > .result-block:last-child {
+  margin-bottom: 0;
+}
+
+.results-detail-hint {
+  margin-bottom: 12px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.8;
+}
