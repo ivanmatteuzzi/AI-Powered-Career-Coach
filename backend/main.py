@@ -9,6 +9,8 @@ from backend.database import get_db
 from backend.models import JobSearchRecord
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.exc import SQLAlchemyError
+from backend.schemas import SalaryEstimatorRequest, SalaryEstimatorResponse
+from backend.services.salary_estimator import estimate_salary
 
 from typing import Any
 from uuid import UUID
@@ -303,6 +305,30 @@ def learning_roadmap_endpoint(
             detail=(
                 "The learning roadmap service could not complete "
                 "the request. Please retry."
+            ),
+        ) from exc
+
+# ============================================================
+# SALARY ESTIMATOR
+# ============================================================
+
+@app.post(
+    "/api/v1/salary-estimator/estimate",
+    response_model=SalaryEstimatorResponse,
+)
+def salary_estimator_endpoint(
+    payload: SalaryEstimatorRequest,
+) -> SalaryEstimatorResponse:
+    """Estimate annual gross salary using current web research."""
+    try:
+        return estimate_salary(payload)
+    except Exception as exc:
+        logger.exception("Salary estimation failed")
+        raise HTTPException(
+            status_code=502,
+            detail=(
+                "The salary estimate could not be completed. "
+                "Please retry."
             ),
         ) from exc
 

@@ -473,3 +473,32 @@ class LLMJudgeResponse(BaseModel):
     issues: list[JudgeIssue] = Field(default_factory=list)
     revision_instructions: list[str] = Field(default_factory=list)
     limitations: str
+
+class SalaryEstimatorRequest(BaseModel):
+    """Input for estimating annual gross salary in Germany."""
+
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+    )
+
+    target_role: str = Field(min_length=2, max_length=160)
+    location: str = Field(min_length=2, max_length=160)
+    seniority: Literal["junior", "mid", "senior", "lead"] = "junior"
+    cv_text: str | None = Field(default=None, max_length=30000)
+    language: Literal["English", "Italian", "German", "Turkish"] = "English"
+
+
+class SalaryEstimatorResponse(BaseModel):
+    """Estimated annual gross salary and supporting evidence."""
+
+    target_role: str
+    location: str
+    currency: str = "EUR"
+    salary_min_annual: int = Field(ge=0)
+    salary_max_annual: int = Field(ge=0)
+    summary: str
+    factors: list[str]
+    sources: list[dict[str, str]]
+    confidence: Literal["low", "medium", "high"]
+    limitations: str

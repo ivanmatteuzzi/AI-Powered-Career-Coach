@@ -80,6 +80,57 @@ const MODULES = {
     ]
   },
 
+  "salary-estimator": {
+    title: "Salary Estimator",
+    eyebrow: "GERMANY SALARY INSIGHTS",
+    description: "Estimate annual gross salary in Germany using current market information and relevant sources.",
+    endpoint: "/api/v1/salary-estimator/estimate",
+    button: "Estimate salary",
+    fields: [
+      {
+        name: "target_role",
+        label: "Target role",
+        type: "text",
+        required: true,
+        placeholder: "e.g. Junior Python Developer"
+      },
+      {
+        name: "location",
+        label: "City or region in Germany",
+        type: "text",
+        required: true,
+        placeholder: "e.g. Frankfurt am Main"
+      },
+      {
+        name: "seniority",
+        label: "Seniority",
+        type: "select",
+        value: "junior",
+        options: [
+          ["junior", "Entry-level / Junior"],
+          ["mid", "Mid-level"],
+          ["senior", "Senior"],
+          ["lead", "Lead / Manager"]
+        ]
+      },
+      {
+        name: "cv_text",
+        label: "CV text (optional)",
+        type: "textarea",
+        required: false,
+        rows: 5,
+        help: "Optional: include relevant experience and skills. Remove personal information."
+      },
+      {
+        name: "language",
+        label: "Output language",
+        type: "select",
+        value: "English",
+        options: languageOptions()
+      }
+    ]
+  },
+
   "learning-roadmap": {
     title: "Learning Roadmap",
     eyebrow: "YOUR LEARNING JOURNEY",
@@ -572,6 +623,15 @@ function buildPayload(moduleKey, values) {
         skills: splitList(values.skills),
         keywords: splitList(values.keywords),
         max_results: Number(values.max_results),
+        language: values.language
+      };
+
+    case "salary-estimator":
+      return {
+        target_role: values.target_role.trim(),
+        location: values.location.trim(),
+        seniority: values.seniority,
+        cv_text: values.cv_text.trim() || null,
         language: values.language
       };
 
