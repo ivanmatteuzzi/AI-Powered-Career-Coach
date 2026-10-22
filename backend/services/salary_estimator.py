@@ -163,6 +163,18 @@ Do not add other top-level fields.
                 "metadata, so the figures should be treated with particular "
                 "caution and independently checked."
             ).strip()
+# Normalize confidence values if the model translates them.
+        confidence_map = {
+        "low": "low",
+        "bassa": "low",
+        "medium": "medium",
+        "media": "medium",
+        "high": "high",
+        "alta": "high",
+        }
+
+        confidence = str(data.get("confidence", "")).strip().lower()
+        data["confidence"] = confidence_map.get(confidence, "low")
 
         result = SalaryEstimatorResponse.model_validate(data)
 
